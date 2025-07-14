@@ -1,0 +1,36 @@
+{
+  "name": "react-blindspot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "blindspot": "./dist/cli.js",
+    "type": "tsc -p tsconfig.build.json",
+    "build": "npm run type && node build.mjs",
+    "start": "ts-node src/index.ts",
+    "cli": "ts-node src/cli.ts",
+    "dev": "ts-node-dev src/cli.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@babel/parser": "^7.28.0",
+    "@babel/traverse": "^7.28.0",
+    "cosmiconfig": "^9.0.0",
+    "fast-glob": "^3.3.3",
+    "inquirer": "^12.7.0",
+    "openai": "^5.9.0",
+    "yargs": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/babel__traverse": "^7.20.7",
+    "@types/node": "^24.0.13",
+    "@types/yargs": "^17.0.33",
+    "esbuild": "^0.25.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}

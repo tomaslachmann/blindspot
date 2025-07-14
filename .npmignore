@@ -1,0 +1,8 @@
+.gitignore
+build.mjs
+tsconfig.build.json
+tsconfig.json
+src
+node_modules
+.blindspot
+README.md
