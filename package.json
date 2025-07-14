@@ -1,6 +1,6 @@
 {
   "name": "@arcari/react-blindspot",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "**React Blindspot** is a CLI tool that helps developers identify **untested React components, hooks, and logic**, then suggests missing test cases using optional **AI assistance**.",
   "keywords": [],
   "homepage": "https://github.com/tomaslachmann/blindspot#readme",
@@ -17,7 +17,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "blindspot": "./dist/cli.js",
+    "blindspot": "./dist/reactblindspot.js",
     "type": "tsc -p tsconfig.build.json",
     "build": "npm run type && node build.mjs",
     "start": "ts-node src/index.ts",
