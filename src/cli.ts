@@ -19,7 +19,7 @@ yargs(hideBin(process.argv))
     description: "Print the resolved config and exit",
   })
   .command(
-    "*",
+    "analyze",
     "Analyze the test coverage of your React project",
     () => {},
     async (argv) => {
