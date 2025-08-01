@@ -1,62 +1,138 @@
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
+import { ParsedSource, ParsedTest } from "../parser/types";
 
-const CACHE_DIR = path.resolve(".blindspot");
-const CACHE_FILE = path.join(CACHE_DIR, "cache.json");
-
-export type CacheEntry = {
+export interface SourceFileCacheEntry {
   hash: string;
-  summary?: string[];
+  usage?: ParsedSource;
   tested?: boolean;
-  usage?: {
-    filePath: string;
-    exports: string[];
-    usedHooks: string[];
-    usedComponents: string[];
-    conditions: string[];
-  };
   matchedTestFiles?: string[];
-  aiSuggestion?: string; // <-- Add this for AI results
-};
+  aiSuggestion?: string;
+  summary?: string[];
+}
 
-export type Cache = Record<string, CacheEntry>;
+export interface TestFileCacheEntry {
+  hash: string;
+  testInfo?: ParsedTest;
+  aiSuggestion?: string;
+  summary?: string[];
+}
 
-export function ensureCacheDirExists() {
-  if (!fs.existsSync(CACHE_DIR)) {
-    fs.mkdirSync(CACHE_DIR);
+const CACHE_ROOT = path.resolve(".blindspot/cache");
+const SOURCE_DIR = path.join(CACHE_ROOT, "sources");
+const TEST_DIR = path.join(CACHE_ROOT, "tests");
+
+function ensureDirExists(dir: string) {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
   }
 }
 
-export function loadCache(): Cache {
-  ensureCacheDirExists();
-  if (!fs.existsSync(CACHE_FILE)) return {};
-  const raw = fs.readFileSync(CACHE_FILE, "utf-8");
-  return JSON.parse(raw);
+function toCacheFileName(filePath: string): string {
+  return Buffer.from(filePath).toString("base64") + ".json";
 }
 
-export function saveCache(cache: Cache) {
-  ensureCacheDirExists();
-  fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2));
+function fromCacheFileName(filename: string): string {
+  return Buffer.from(filename.replace(/\.json$/, ""), "base64").toString(
+    "utf8",
+  );
 }
 
 export function getFileHash(content: string): string {
   return crypto.createHash("sha256").update(content).digest("hex");
 }
 
-export function isFileCachedUnchanged(
-  filePath: string,
-  content: string,
-  cache: Cache,
-): boolean {
-  const cached = cache[filePath];
-  const hash = getFileHash(content);
-  return cached?.hash === hash;
+export function saveSourceCache(filePath: string, entry: SourceFileCacheEntry) {
+  ensureDirExists(SOURCE_DIR);
+  const filename = toCacheFileName(filePath);
+  fs.writeFileSync(
+    path.join(SOURCE_DIR, filename),
+    JSON.stringify(entry, null, 2),
+  );
 }
 
-export function clearCache() {
-  if (fs.existsSync(CACHE_FILE)) {
-    fs.unlinkSync(CACHE_FILE);
+export function saveTestCache(filePath: string, entry: TestFileCacheEntry) {
+  ensureDirExists(TEST_DIR);
+  const filename = toCacheFileName(filePath);
+  fs.writeFileSync(
+    path.join(TEST_DIR, filename),
+    JSON.stringify(entry, null, 2),
+  );
+}
+
+export function loadSourceCache(
+  filePath: string,
+): SourceFileCacheEntry | undefined {
+  const filename = toCacheFileName(filePath);
+  const fullPath = path.join(SOURCE_DIR, filename);
+  if (!fs.existsSync(fullPath)) return undefined;
+  return JSON.parse(fs.readFileSync(fullPath, "utf-8"));
+}
+
+export function loadTestCache(
+  filePath: string,
+): TestFileCacheEntry | undefined {
+  const filename = toCacheFileName(filePath);
+  const fullPath = path.join(TEST_DIR, filename);
+  if (!fs.existsSync(fullPath)) return undefined;
+  return JSON.parse(fs.readFileSync(fullPath, "utf-8"));
+}
+
+export function clearAllCache() {
+  if (fs.existsSync(CACHE_ROOT)) {
+    fs.rmSync(CACHE_ROOT, { recursive: true, force: true });
     console.log("🗑️  Cache cleared.");
   }
+}
+
+export function isFileCachedUnchanged(filePath: string): boolean {
+  if (!fs.existsSync(filePath)) return false;
+
+  const content = fs.readFileSync(filePath, "utf-8");
+  const cached = loadSourceCache(filePath);
+  if (!cached) return false;
+
+  const currentHash = getFileHash(content);
+  return cached.hash === currentHash;
+}
+
+export type Cache = {
+  sourceFiles: Record<string, SourceFileCacheEntry>;
+  testFiles: Record<string, TestFileCacheEntry>;
+};
+
+export function loadAllCache(): Cache {
+  const sourceFiles: Record<string, SourceFileCacheEntry> = {};
+  const testFiles: Record<string, TestFileCacheEntry> = {};
+
+  if (fs.existsSync(SOURCE_DIR)) {
+    for (const file of fs.readdirSync(SOURCE_DIR)) {
+      const fullPath = path.join(SOURCE_DIR, file);
+      try {
+        const raw = fs.readFileSync(fullPath, "utf-8");
+        const parsed = JSON.parse(raw);
+        const absPath = path.resolve(SOURCE_DIR, file.replace(/\\.json$/, ""));
+        sourceFiles[absPath] = parsed;
+      } catch {
+        console.warn(`⚠️ Skipping corrupted source cache file: ${file}`);
+      }
+    }
+  }
+
+  if (fs.existsSync(TEST_DIR)) {
+    for (const file of fs.readdirSync(TEST_DIR)) {
+      const fullPath = path.join(TEST_DIR, file);
+      try {
+        const raw = fs.readFileSync(fullPath, "utf-8");
+        const parsed = JSON.parse(raw);
+        const absPath = path.resolve(TEST_DIR, file.replace(/\\.json$/, ""));
+        testFiles[absPath] = parsed;
+      } catch {
+        console.warn(`⚠️ Skipping corrupted test cache file: ${file}`);
+      }
+    }
+  }
+
+  return { sourceFiles, testFiles };
 }

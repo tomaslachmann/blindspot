@@ -1,8 +1,8 @@
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { run } from "./index";
+import { run } from "./";
 import { loadConfig } from "./config/loadConfig";
-import { clearCache } from "./cache/cache";
+import { clearAllCache } from "./cache/cache";
 
 yargs(hideBin(process.argv))
   .scriptName("blindspot")
@@ -24,7 +24,7 @@ yargs(hideBin(process.argv))
     () => {},
     async (argv) => {
       if (argv["reset-cache"]) {
-        clearCache();
+        clearAllCache();
       }
 
       if (argv["show-config"]) {

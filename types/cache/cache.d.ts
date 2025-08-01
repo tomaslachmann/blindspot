@@ -1,21 +1,27 @@
-export type CacheEntry = {
+import { ParsedSource, ParsedTest } from "../parser/types";
+export interface SourceFileCacheEntry {
     hash: string;
-    summary?: string[];
+    usage?: ParsedSource;
     tested?: boolean;
-    usage?: {
-        filePath: string;
-        exports: string[];
-        usedHooks: string[];
-        usedComponents: string[];
-        conditions: string[];
-    };
     matchedTestFiles?: string[];
     aiSuggestion?: string;
-};
-export type Cache = Record<string, CacheEntry>;
-export declare function ensureCacheDirExists(): void;
-export declare function loadCache(): Cache;
-export declare function saveCache(cache: Cache): void;
+    summary?: string[];
+}
+export interface TestFileCacheEntry {
+    hash: string;
+    testInfo?: ParsedTest;
+    aiSuggestion?: string;
+    summary?: string[];
+}
 export declare function getFileHash(content: string): string;
-export declare function isFileCachedUnchanged(filePath: string, content: string, cache: Cache): boolean;
-export declare function clearCache(): void;
+export declare function saveSourceCache(filePath: string, entry: SourceFileCacheEntry): void;
+export declare function saveTestCache(filePath: string, entry: TestFileCacheEntry): void;
+export declare function loadSourceCache(filePath: string): SourceFileCacheEntry | undefined;
+export declare function loadTestCache(filePath: string): TestFileCacheEntry | undefined;
+export declare function clearAllCache(): void;
+export declare function isFileCachedUnchanged(filePath: string): boolean;
+export type Cache = {
+    sourceFiles: Record<string, SourceFileCacheEntry>;
+    testFiles: Record<string, TestFileCacheEntry>;
+};
+export declare function loadAllCache(): Cache;

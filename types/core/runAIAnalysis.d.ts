@@ -1,7 +1,3 @@
-import type { Cache } from "../cache/cache";
 import type { AnalyzerConfig } from "../config/types";
-import { TestMatchResult } from "../matcher/types";
-export declare function runAIAnalysis(parsedSources: {
-    filePath: string;
-    usage: any;
-}[], matches: TestMatchResult[], config: AnalyzerConfig, cache: Cache): Promise<void>;
+import { ParsedSource, ParsedTest } from "../parser/types";
+export declare function runAIAnalysis(parsedSources: ParsedSource[], parsedTests: ParsedTest[], config: AnalyzerConfig): Promise<void>;

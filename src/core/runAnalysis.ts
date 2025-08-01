@@ -1,4 +1,4 @@
-import { loadCache, saveCache } from "../cache/cache";
+import { loadAllCache } from "../cache/cache";
 import { AnalyzerConfig } from "../config/types";
 import { matchTestsToSourceFiles } from "../matcher/matchTestsToSource";
 import { promptGenerateTests } from "./interactivePrompt";
@@ -13,28 +13,24 @@ export async function runAnalysis(
   config: AnalyzerConfig,
   useCache = true,
 ) {
-  const cache = useCache ? loadCache() : {};
+  const cache = useCache ? loadAllCache() : { sourceFiles: {}, testFiles: {} };
 
-  const parsedSources = await parseSources(sourceFiles, cache, useCache);
+  const parsedSources = await parseSources(sourceFiles, useCache);
   const parsedTests = parseTests(testFiles);
 
-  const matches = matchTestsToSourceFiles(
-    parsedSources.map(({ ast, filePath }) => ({
-      filePath,
-      exports: ast.exports,
-    })),
-    parsedTests,
-  );
+  const matches = matchTestsToSourceFiles(parsedSources, parsedTests);
 
   // Update cache tested info
   for (const match of matches) {
     const { sourceFile, isTested, matchedTestFiles } = match;
     const filePath = sourceFile.filePath;
-    cache[filePath] = {
-      ...cache[filePath],
+
+    cache.sourceFiles[filePath] = {
+      ...cache.sourceFiles[filePath],
       tested: isTested,
       matchedTestFiles,
     };
+
     const relativePath = path.relative(
       process.cwd(),
       match.sourceFile.filePath,
@@ -50,7 +46,7 @@ export async function runAnalysis(
     }
   }
 
-  await runAIAnalysis(parsedSources, matches, config, cache);
+  await runAIAnalysis(parsedSources, parsedTests, config);
 
   // After AI suggestions cached and printed
   const untestedFiles = matches

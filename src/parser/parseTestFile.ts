@@ -1,57 +1,123 @@
-// src/parser/parseTestFile.ts
-
-import fs from "fs";
-import * as parser from "@babel/parser";
-import traverseModule from "@babel/traverse";
+import { parse } from "@babel/parser";
+import traverseNs, { NodePath } from "@babel/traverse";
+import generateNs from "@babel/generator";
+import * as t from "@babel/types";
 import { ParsedTest } from "./types";
+import fs from "fs";
 
-// @ts-expect-error type error between commonJs and ESM
-const traverse = traverseModule.default as unknown as typeof traverseModule;
+//@ts-ignore
+const traverse = traverseNs.default as typeof traverseNs;
+
+//@ts-ignore
+const generate = generateNs.default as typeof generateNs;
 
 export function parseTestFile(filePath: string): ParsedTest {
   const code = fs.readFileSync(filePath, "utf-8");
+  const imports: ParsedTest["imports"] = [];
+  const testCases: ParsedTest["testCases"] = [];
+  let currentDescribe: string | undefined = undefined;
 
-  const ast = parser.parse(code, {
+  const ast = parse(code, {
     sourceType: "module",
     plugins: ["typescript", "jsx"],
   });
 
-  const imports: ParsedTest["imports"] = [];
-  const testedIdentifiers: string[] = [];
-
   traverse(ast, {
-    ImportDeclaration(pathNode) {
-      const importSource = pathNode.node.source.value;
+    ImportDeclaration(p) {
+      const source = p.node.source.value;
+      const specs: ParsedTest["imports"][0]["imported"] = [];
 
-      // Only match relative imports (for local source files)
-      if (importSource.startsWith(".")) {
-        const imported: string[] = [];
-
-        for (const spec of pathNode.node.specifiers) {
-          if (
-            spec.type === "ImportSpecifier" ||
-            spec.type === "ImportDefaultSpecifier" ||
-            spec.type === "ImportNamespaceSpecifier"
-          ) {
-            imported.push(spec.local.name);
-          }
+      for (const s of p.node.specifiers) {
+        if (t.isImportDefaultSpecifier(s)) {
+          specs.push({ name: s.local.name, isDefault: true });
+        } else if (t.isImportSpecifier(s)) {
+          specs.push({
+            name: s.local.name,
+            original: t.isIdentifier(s.imported) ? s.imported.name : undefined,
+            isDefault: false,
+          });
         }
-
-        imports.push({
-          source: importSource,
-          imported,
-        });
       }
+
+      imports.push({ source, imported: specs });
     },
-    CallExpression(pathNode) {
-      const callee = pathNode.node.callee;
+
+    CallExpression(p) {
+      const callee = p.node.callee;
+
+      // Handle describe block
+      if (t.isIdentifier(callee) && callee.name === "describe") {
+        const arg = p.node.arguments[0];
+        if (t.isStringLiteral(arg)) {
+          currentDescribe = arg.value;
+        }
+      }
+
+      // Handle test or it block
       if (
-        callee.type === "Identifier" &&
-        ["describe", "it", "test"].includes(callee.name)
+        t.isIdentifier(callee) &&
+        (callee.name === "it" || callee.name === "test")
       ) {
-        const arg = pathNode.node.arguments[0];
-        if (arg?.type === "StringLiteral") {
-          testedIdentifiers.push(arg.value);
+        const testNameNode = p.node.arguments[0];
+        const testFnNode = p.node.arguments[1];
+
+        if (
+          t.isStringLiteral(testNameNode) &&
+          (t.isFunction(testFnNode) || t.isArrowFunctionExpression(testFnNode))
+        ) {
+          const name = testNameNode.value;
+          const testedIdentifiers: Set<string> = new Set();
+          const assertions: string[] = [];
+
+          traverse(
+            testFnNode.body,
+            {
+              CallExpression(inner) {
+                const innerCallee = inner.node.callee;
+                if (t.isIdentifier(innerCallee)) {
+                  if (
+                    ["expect", "render", "renderHook"].includes(
+                      innerCallee.name,
+                    )
+                  ) {
+                    if (innerCallee.name === "expect") {
+                      assertions.push(generate(inner.node).code);
+                    } else {
+                      inner.node.arguments.forEach((arg) => {
+                        if (t.isIdentifier(arg)) {
+                          testedIdentifiers.add(arg.name);
+                        }
+                        if (
+                          t.isArrowFunctionExpression(arg) &&
+                          t.isCallExpression(arg.body) &&
+                          t.isIdentifier(arg.body.callee)
+                        ) {
+                          testedIdentifiers.add(arg.body.callee.name);
+                        }
+                      });
+                    }
+                  }
+                }
+              },
+              JSXOpeningElement(inner) {
+                if (t.isJSXIdentifier(inner.node.name)) {
+                  testedIdentifiers.add(inner.node.name.name);
+                }
+              },
+            },
+            p.scope,
+            p.state,
+            p,
+          );
+
+          const raw = generate(testFnNode.body).code;
+          testCases.push({
+            describe: currentDescribe,
+            name,
+            testedIdentifiers: Array.from(testedIdentifiers),
+            assertions,
+            raw,
+          });
         }
       }
     },
@@ -60,6 +126,6 @@ export function parseTestFile(filePath: string): ParsedTest {
   return {
     filePath,
     imports,
-    testedIdentifiers,
+    testCases,
   };
 }

@@ -1,1 +1,1 @@
-export declare function discoverFiles(sourceDir: string, ignore: string[]): Promise<string[]>;
+export declare function discoverFiles(sourceDir: string, ignore: string[], testDir?: string): Promise<string[]>;

@@ -5,10 +5,12 @@ import { runAnalysis } from "./core/runAnalysis";
 
 export async function run(options: { useCache: boolean }) {
   console.log("🔍 React Blindspot: Analyzing tests...\n");
-
   const config = await loadConfig();
-  const allFiles = await discoverFiles(config.sourceDir, config.ignore || []);
+  const allFiles = await discoverFiles(
+    config.sourceDir,
+    config.ignore || [],
+    config.testDir,
+  );
   const { testFiles, sourceFiles } = splitTestAndSourceFiles(allFiles);
-
   runAnalysis(sourceFiles, testFiles, config, options.useCache);
 }

@@ -1,6 +1,6 @@
 {
   "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/cli.ts": {
-    "hash": "b1772b056719e4542067b8e62ee5760eefb624c7f67da5abbb181c5bc3c94f20",
+    "hash": "71d0f6d2fe34c681bb3a43016ca1f473fdac81d740992761b7a114a7a04e553f",
     "usage": {
       "filePath": "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/cli.ts",
       "exports": [],
@@ -14,7 +14,7 @@
     "matchedTestFiles": []
   },
   "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/index.ts": {
-    "hash": "068c449b0f7a0a08852e3e8d6fef7b6ddf3ea3598373d70aac54682ec6575a14",
+    "hash": "87af464e8f1f915cac6811675c21edb6822906f24a53a77d70d97340ca410877",
     "usage": {
       "filePath": "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/index.ts",
       "exports": [
@@ -28,7 +28,7 @@
     "matchedTestFiles": []
   },
   "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/ai/generatePrompt.ts": {
-    "hash": "833f10c0b618e85241fc1f24346f0f388e83dfe9de5ea95df9c72e6c7fc9dd4f",
+    "hash": "9b07639dec9cbce3c12b751c4d751d0b8919399f2f9a2c43d802bcfa610ef7a1",
     "usage": {
       "filePath": "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/ai/generatePrompt.ts",
       "exports": [
@@ -37,8 +37,10 @@
       "usedHooks": [],
       "usedComponents": [],
       "conditions": [
+        "MemberExpression",
+        "CallExpression",
         "BinaryExpression",
-        "Identifier"
+        "OptionalMemberExpression"
       ]
     },
     "tested": false,
@@ -62,16 +64,18 @@
     "matchedTestFiles": []
   },
   "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/cache/cache.ts": {
-    "hash": "57c987634d8c4097ec28e1d2f1f0808f678bb6c951abf3224c7ac02e2712cf44",
+    "hash": "73973512bc8184c72404f5b1d7c09d86edbd548f1e68cfc0a43dad4a3f50e7a9",
     "usage": {
       "filePath": "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/cache/cache.ts",
       "exports": [
-        "ensureCacheDirExists",
-        "loadCache",
-        "saveCache",
         "getFileHash",
+        "saveSourceCache",
+        "saveTestCache",
+        "loadSourceCache",
+        "loadTestCache",
+        "clearAllCache",
         "isFileCachedUnchanged",
-        "clearCache"
+        "loadAllCache"
       ],
       "usedHooks": [],
       "usedComponents": [],
@@ -80,8 +84,10 @@
         "CallExpression"
       ]
     },
-    "tested": false,
-    "matchedTestFiles": []
+    "tested": true,
+    "matchedTestFiles": [
+      "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/omg/cache.test.ts"
+    ]
   },
   "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/config/defaultConfig.ts": {
     "hash": "1d937393f313e5391dd9fb232126761ba27b0fb02829e78c6b95b82415fcfbe7",
@@ -98,7 +104,7 @@
     "matchedTestFiles": []
   },
   "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/config/loadConfig.ts": {
-    "hash": "f8d9c7988bf92f5441de43cfdb6ad58fb2dadfc804b774a6475bc65a5805c52a",
+    "hash": "37d6cc5aad133020c3ab24c9ad8f1843ff15cc2ec2bdceb7cea7d12bf4e58168",
     "usage": {
       "filePath": "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/config/loadConfig.ts",
       "exports": [
@@ -107,17 +113,14 @@
       "usedHooks": [],
       "usedComponents": [],
       "conditions": [
-        "UnaryExpression",
-        "OptionalMemberExpression",
-        "LogicalExpression",
-        "logical &&"
+        "UnaryExpression"
       ]
     },
     "tested": false,
     "matchedTestFiles": []
   },
   "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/core/discoverFiles.ts": {
-    "hash": "5bae996755eca58dcff974391e8edba6ada31a34625640ee9b577b261e58e705",
+    "hash": "af4da75e9f388939fcee881a6833c6ba1e1e0e809906dc8ffa3e1a8e519b8d0d",
     "usage": {
       "filePath": "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/core/discoverFiles.ts",
       "exports": [
@@ -126,6 +129,7 @@
       "usedHooks": [],
       "usedComponents": [],
       "conditions": [
+        "Identifier",
         "logical &&"
       ]
     },
@@ -150,7 +154,7 @@
     "matchedTestFiles": []
   },
   "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/core/parseSources.ts": {
-    "hash": "0e07cb4b15607adf0cb236290b3258bd370b62749a73b02c84305f0d0f07854c",
+    "hash": "a8484ca798a02f9211136b3a7732e349b7f4541a8decd42d65a728a162d18942",
     "usage": {
       "filePath": "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/core/parseSources.ts",
       "exports": [
@@ -161,6 +165,7 @@
       "conditions": [
         "LogicalExpression",
         "logical &&",
+        "OptionalMemberExpression",
         "Identifier"
       ]
     },
@@ -182,7 +187,7 @@
     "matchedTestFiles": []
   },
   "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/core/runAIAnalysis.ts": {
-    "hash": "6310f6352e94eeb070d6da5d4f78e3ce89d055550d3d1045e53ff3345ee069fe",
+    "hash": "57f8ffb40f3a5e77d7c2fc4bd08678f5d35c5aef063a5996a5c8181e56068b84",
     "usage": {
       "filePath": "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/core/runAIAnalysis.ts",
       "exports": [
@@ -199,7 +204,7 @@
     "matchedTestFiles": []
   },
   "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/core/runAnalysis.ts": {
-    "hash": "94ec19d9a7c23077369a73ef5ab2b1ecb274fe3582af7329b0ef70997f2d635c",
+    "hash": "fd1ebf3e97654022c9e89b4e78d332634c109fcc42bf39ffe0aaa37ef313936b",
     "usage": {
       "filePath": "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/core/runAnalysis.ts",
       "exports": [
@@ -217,7 +222,7 @@
     "matchedTestFiles": []
   },
   "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/matcher/matchTestsToSource.ts": {
-    "hash": "1c723847fa8cceda7239fdfacea760cc9b4638d89afbbb7e1eed005068adbd5f",
+    "hash": "e15cc091cf37ba59c5fdd9ac25e54afd2a3790dabb894262a296d698bda5a767",
     "usage": {
       "filePath": "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/matcher/matchTestsToSource.ts",
       "exports": [
@@ -226,14 +231,16 @@
       "usedHooks": [],
       "usedComponents": [],
       "conditions": [
-        "CallExpression"
+        "CallExpression",
+        "BinaryExpression",
+        "Identifier"
       ]
     },
     "tested": false,
     "matchedTestFiles": []
   },
   "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/parser/parseSourceFile.ts": {
-    "hash": "ccc67f373cf2b6691f75e796ffba679db7b9ffb15c120cd1930995e169ec9db2",
+    "hash": "a281c1b53834b625dd3ff0190f1479c96c6a7453321b09793836a398e9056af1",
     "usage": {
       "filePath": "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/parser/parseSourceFile.ts",
       "exports": [
@@ -244,14 +251,15 @@
       "conditions": [
         "BinaryExpression",
         "Identifier",
-        "MemberExpression"
+        "MemberExpression",
+        "CallExpression"
       ]
     },
     "tested": false,
     "matchedTestFiles": []
   },
   "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/parser/parseTestFile.ts": {
-    "hash": "cfae83ca8f9e68c2ce7bcd6cd613d15cda55c1b913877f37052cce274b827e7b",
+    "hash": "0a6088e82228206e20d518b5e4c9f55ad8198a5b19b47833415c54d48afdfa34",
     "usage": {
       "filePath": "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/parser/parseTestFile.ts",
       "exports": [
@@ -261,10 +269,62 @@
       "usedComponents": [],
       "conditions": [
         "CallExpression",
+        "ternary",
         "LogicalExpression",
         "logical &&",
         "BinaryExpression"
       ]
+    },
+    "tested": false,
+    "matchedTestFiles": []
+  },
+  "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/analyzer/analyzeUsages.ts": {
+    "hash": "0a7386cc011feb5afcc91003a5d877f733e7719b8b3c170703744ae538c054ab",
+    "usage": {
+      "filePath": "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/analyzer/analyzeUsages.ts",
+      "exports": [
+        "analyzeUsages"
+      ],
+      "usedHooks": [],
+      "usedComponents": [],
+      "conditions": [
+        "LogicalExpression",
+        "logical &&",
+        "CallExpression",
+        "BinaryExpression"
+      ]
+    },
+    "tested": false,
+    "matchedTestFiles": []
+  },
+  "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/core/identifyTestFiles.ts": {
+    "hash": "a02dffdccd1a0c89a4a5bfe331a7de7fb3694c2360007afe0712c51da8be9c10",
+    "usage": {
+      "filePath": "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/core/identifyTestFiles.ts",
+      "exports": [
+        "isTestFile",
+        "splitTestAndSourceFiles"
+      ],
+      "usedHooks": [],
+      "usedComponents": [],
+      "conditions": [
+        "BinaryExpression",
+        "LogicalExpression",
+        "logical &&",
+        "CallExpression"
+      ]
+    },
+    "tested": false,
+    "matchedTestFiles": []
+  },
+  "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/omg/cache.test.ts": {
+    "hash": "76ccb2ef9eabf372a2f153f4f1094388a1de4ca8bf95e562af5c8a6c4caa9d9b",
+    "usage": {
+      "filePath": "/Users/tomaslachmann/Desktop/work/Personal/react-blindspot/src/omg/cache.test.ts",
+      "exports": [],
+      "usedHooks": [],
+      "usedComponents": [],
+      "conditions": []
     },
     "tested": false,
     "matchedTestFiles": []

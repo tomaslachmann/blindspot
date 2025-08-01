@@ -31,21 +31,38 @@ export function matchTestsToSourceFiles(
 
   for (const source of sourceFiles) {
     const resolvedSourcePath = path.resolve(source.filePath);
+    const matchedTestFiles: string[] = [];
 
-    const matchedTests = testFiles.filter((test) =>
-      test.imports.some((importEntry) => {
+    for (const test of testFiles) {
+      for (const importEntry of test.imports) {
         const resolvedImportPath = resolveImportPath(
           test.filePath,
           importEntry.source,
         );
-        return resolvedImportPath === resolvedSourcePath;
-      }),
-    );
+
+        if (resolvedImportPath === resolvedSourcePath) {
+          // Check if any identifiers match the exported names
+          const importedNames = importEntry.imported.map((i) => i.name);
+          const testedNames = test.testCases.flatMap(
+            (t) => t.testedIdentifiers,
+          );
+
+          const matchesExported = source.exports.some(
+            (exp) => testedNames.includes(exp) || importedNames.includes(exp),
+          );
+
+          if (matchesExported) {
+            matchedTestFiles.push(test.filePath);
+            break;
+          }
+        }
+      }
+    }
 
     matches.push({
       sourceFile: source,
-      isTested: matchedTests.length > 0,
-      matchedTestFiles: matchedTests.map((t) => t.filePath),
+      isTested: matchedTestFiles.length > 0,
+      matchedTestFiles,
     });
   }
 

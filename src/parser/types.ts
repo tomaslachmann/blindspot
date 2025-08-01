@@ -2,14 +2,28 @@
 
 export interface ParsedSource {
   filePath: string;
-  exports: string[]; // e.g. ['LoginForm', 'useAuth']
+  exports: string[];
+  usedHooks: string[];
+  usedComponents: string[];
+  conditions: string[];
+  rawContent?: string;
 }
 
 export interface ParsedTest {
   filePath: string;
   imports: {
     source: string; // raw import path (e.g., '../components/Button')
-    imported: string[]; // named or default imports
+    imported: {
+      name: string;
+      original?: string | undefined;
+      isDefault: boolean;
+    }[]; // named or default imports
   }[];
-  testedIdentifiers: string[];
+  testCases: {
+    describe?: string;
+    name: string;
+    testedIdentifiers: string[];
+    assertions: string[];
+    raw?: string;
+  }[];
 }

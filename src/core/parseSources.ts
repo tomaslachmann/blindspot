@@ -1,33 +1,43 @@
-import fs from "fs";
 import { parseSourceFile } from "../parser/parseSourceFile";
-import { analyzeUsages } from "../analyzer/analyzeUsages";
-import { getFileHash, isFileCachedUnchanged, Cache } from "../cache/cache";
+import {
+  getFileHash,
+  isFileCachedUnchanged,
+  loadSourceCache,
+  saveSourceCache,
+  SourceFileCacheEntry,
+} from "../cache/cache";
+import { ParsedSource } from "../parser/types";
 
 export async function parseSources(
   sourceFiles: string[],
-  cache: Cache,
   useCache: boolean,
-) {
-  const tempParsedSources = [];
-  for (const file of sourceFiles) {
-    const content = fs.readFileSync(file, "utf-8");
-    const hash = getFileHash(content);
+): Promise<ParsedSource[]> {
+  const parsedSources: ParsedSource[] = [];
 
-    if (useCache && isFileCachedUnchanged(file, content, cache)) {
-      const cachedUsage = cache[file]?.usage;
-      const usage = cachedUsage ?? analyzeUsages(content, file);
-      const ast = parseSourceFile(file);
-      tempParsedSources.push({ filePath: file, ast, usage });
-      continue;
+  for (const file of sourceFiles) {
+    if (useCache && isFileCachedUnchanged(file)) {
+      const cached = loadSourceCache(file);
+      if (cached?.usage) {
+        parsedSources.push(cached.usage);
+        continue;
+      }
     }
 
-    const ast = parseSourceFile(file);
-    const usage = analyzeUsages(content, file);
-    tempParsedSources.push({ filePath: file, ast, usage });
+    const parsed = parseSourceFile(file);
+    const hash = getFileHash(parsed.rawContent || "");
+
+    parsedSources.push(parsed);
 
     if (useCache) {
-      cache[file] = { hash, usage };
+      const cacheEntry: SourceFileCacheEntry = {
+        hash,
+        usage: parsed,
+        tested: false,
+        matchedTestFiles: [],
+      };
+      saveSourceCache(file, cacheEntry);
     }
   }
-  return tempParsedSources;
+
+  return parsedSources;
 }
